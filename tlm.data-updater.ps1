@@ -161,6 +161,7 @@ Timeout /T 2
 
 Write-Host 'Installing the Spotify Patch..'
 
-Write-Host 'Patching Complete, starting Spotify - Please await the next step..'
+Write-Host 'Patching Complete, - Please await the next step..'
 
-Start-Process -WorkingDirectory $spotifyDirectory -FilePath $spotifyExecutable
+Write-Host "!!! DO NOT OPEN YOUR SPOTIFY - IT WILL CORRUPT !!!"
+
