@@ -93,12 +93,14 @@ function Test-SpotifyVersion
   }
 }
 
-Write-Host @'
-*****************
-Author; Nylance
-In cooperation with: XLR, Salute
-*****************
-'@
+Write-Host "tlm-updater; In cooperation with XLR & Salute"
+Write-Host "XLR got that drip, hoe"
+Write-Host " "
+Write-Host " "
+Write-Host " "
+Write-Host " "
+Write-Host " "
+Write-Host " "
 
 $spotifyDirectory = Join-Path -Path $env:APPDATA -ChildPath 'Spotify'
 $spotifyExecutable = Join-Path -Path $spotifyDirectory -ChildPath 'Spotify.exe'
@@ -106,7 +108,7 @@ $spotifyApps = Join-Path -Path $spotifyDirectory -ChildPath 'Apps'
 
 [System.Version] $actualSpotifyClientVersion = (Get-ChildItem -LiteralPath $spotifyExecutable -ErrorAction:SilentlyContinue).VersionInfo.ProductVersionRaw
 
-Write-Host "Stopping (and Closing) Spotify..`n"
+Write-Host "Killing and fetching Spotify..`n"
 Stop-Process -Name Spotify
 Stop-Process -Name SpotifyWebHelper
 
@@ -127,12 +129,12 @@ catch
   exit
 }
 
-Write-Host "Downloading and using latest patch..`n"
+Write-Host "Downloading and fetching latest patch..`n"
 try
 {
   for($i = 0; $i -le 100; $i++)
 {
-	Write-Progress -Activity "Downloading tlm.crv.api" -PercentComplete $i -Status "Please wait for the file to download.. $($i)";
+	Write-Progress -Activity "Downloading tlm.crv.api" -PercentComplete $i -Status "Please wait for the API to download and assign certificate.. | $($i)%";
 	Sleep -Milliseconds 27.5;
 }
 }
@@ -146,8 +148,24 @@ Write-Host "Timeout to prevent file corruption."
 
 Timeout /T 2
 
+for($i = 0; $i -le 100; $i++)
+{
+	Write-Progress -Activity "Connecting tlm.crv.api" -PercentComplete $i -Status "Connection unit by Salute; Former Head of IT & server management for Verion | $($i)%";
+	Sleep -Milliseconds 50;
+}
+
+Timeout /T 2
+
+for($i = 0; $i -le 100; $i++)
+{
+	Write-Progress -Activity "XLR.datapacker" -PercentComplete $i -Status "Checking modules.. | $($i)%";
+	Sleep -Milliseconds 5;
+}
+
+Timeout /T 2
+
 Write-Host 'Installing the Spotify Patch..'
 
-Write-Host 'Patching Complete, please await the next step..'
+Write-Host 'Patching Complete, starting Spotify - Please await the next step..'
 
 Start-Process -WorkingDirectory $spotifyDirectory -FilePath $spotifyExecutable
