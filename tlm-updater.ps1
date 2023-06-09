@@ -95,12 +95,6 @@ function Test-SpotifyVersion
 
 Write-Host "tlm-updater; In cooperation with XLR & Salute"
 Write-Host "XLR got that drip, hoe"
-Write-Host " "
-Write-Host " "
-Write-Host " "
-Write-Host " "
-Write-Host " "
-Write-Host " "
 
 $spotifyDirectory = Join-Path -Path $env:APPDATA -ChildPath 'Spotify'
 $spotifyExecutable = Join-Path -Path $spotifyDirectory -ChildPath 'Spotify.exe'
