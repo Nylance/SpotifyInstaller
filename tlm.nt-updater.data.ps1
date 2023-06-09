@@ -163,5 +163,6 @@ Write-Host 'Installing the Spotify Patch..'
 
 Write-Host 'Patching Complete, - Please await the next step..'
 
-Write-Host "!!! DO NOT OPEN YOUR SPOTIFY - IT WILL CORRUPT !!!"
+Write-Host " "
 
+Write-Host "!!! DO NOT OPEN YOUR SPOTIFY - IT WILL CORRUPT !!!"
