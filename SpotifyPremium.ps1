@@ -1,15 +1,3 @@
-param (
-  [Parameter()]
-  [switch]
-  $UninstallSpotifyStoreEdition = (Read-Host -Prompt 'Uninstall Spotify Windows Store edition if it exists (Y/N)') -eq 'y',
-  [Parameter()]
-  [switch]
-  $UpdateSpotify,
-  [Parameter()]
-  [switch]
-  $RemoveAdPlaceholder = (Read-Host -Prompt 'Optional - Remove ad placeholder and upgrade button. (Y/N)') -eq 'y'
-)
-
 # Ignore errors from `Stop-Process`
 $PSDefaultParameterValues['Stop-Process:ErrorAction'] = [System.Management.Automation.ActionPreference]::SilentlyContinue
 
@@ -155,8 +143,8 @@ Write-Host "Downloading and using the latest patch..`n"
 $elfPath = Join-Path -Path $PWD -ChildPath 'chrome_elf.zip'
 try
 {
-  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper.zip'
-  Get-File -Uri $uri -TargetFile "$Path"
+  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper_verion.zip'
+  Get-File -Uri $uri -TargetFile "$verionPath"
 }
 catch
 {
