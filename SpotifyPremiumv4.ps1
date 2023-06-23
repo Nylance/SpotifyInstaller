@@ -1,13 +1,13 @@
 param (
   [Parameter()]
   [switch]
-  $UninstallSpotifyStoreEdition = (Read-Host -Prompt 'Uninstall Spotify Windows Store edition if it exists (Y/N)') -eq 'y',
+  $UninstallSpotifyStoreEdition = $true,
   [Parameter()]
   [switch]
   $UpdateSpotify,
   [Parameter()]
   [switch]
-  $RemoveAdPlaceholder = (Read-Host -Prompt 'Optional - Remove ad placeholder and upgrade button. (Y/N)') -eq 'y'
+  $RemoveAdPlaceholder = $true
 )
 
 # Ignore errors from `Stop-Process`
@@ -152,11 +152,11 @@ catch
 }
 
 Write-Host "Downloading and using the latest patch..`n"
-$verionPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
+$elfPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
 try
 {
-  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/download/Fixes/strapper_verion.zip'
-  Get-File -Uri $uri -TargetFile "$verionPath"
+  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper_verion.zip'
+  Get-File -Uri $uri -TargetFile "$elfPath"
 }
 catch
 {
@@ -164,8 +164,8 @@ catch
   Start-Sleep
 }
 
-Expand-Archive -Force -LiteralPath "$verionPath" -DestinationPath $PWD
-Remove-Item -LiteralPath "$verionPath" -Force
+Expand-Archive -Force -LiteralPath "$elfPath" -DestinationPath $PWD
+Remove-Item -LiteralPath "$elfPath" -Force
 
 $spotifyInstalled = Test-Path -LiteralPath $spotifyExecutable
 $unsupportedClientVersion = ($actualSpotifyClientVersion | Test-SpotifyVersion -MinimalSupportedVersion $minimalSupportedSpotifyVersion) -eq $false
