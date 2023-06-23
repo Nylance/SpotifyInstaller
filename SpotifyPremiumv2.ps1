@@ -152,7 +152,7 @@ catch
 }
 
 Write-Host "Downloading and using the latest patch..`n"
-$elfPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
+$verionPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
 try
 {
   $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper_verion.zip'
