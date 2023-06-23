@@ -239,14 +239,6 @@ Pop-Location
 
 Remove-Item -LiteralPath $tempDirectory -Recurse
 
-try
-{
-  for($i = 0; $i -le 100; $i++)
-{
-	Write-Progress -Activity "Patching Spotify" -PercentComplete $i -Status "Please wait for VerionSPTModifier to inject.. | $($i)%";
-	Sleep -Milliseconds 40;
-}
-
 Write-Host 'Patching Complete, starting Spotify...'
 
 Start-Process -WorkingDirectory $spotifyDirectory -FilePath $spotifyExecutable
