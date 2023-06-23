@@ -1,3 +1,15 @@
+param (
+  [Parameter()]
+  [switch]
+  $UninstallSpotifyStoreEdition = $true,
+  [Parameter()]
+  [switch]
+  $UpdateSpotify,
+  [Parameter()]
+  [switch]
+  $RemoveAdPlaceholder = $true
+)
+
 # Ignore errors from `Stop-Process`
 $PSDefaultParameterValues['Stop-Process:ErrorAction'] = [System.Management.Automation.ActionPreference]::SilentlyContinue
 
@@ -152,8 +164,8 @@ catch
   Start-Sleep
 }
 
-Expand-Archive -Force -LiteralPath "$elfPath" -DestinationPath $PWD
-Remove-Item -LiteralPath "$elfPath" -Force
+Expand-Archive -Force -LiteralPath "$verionPath" -DestinationPath $PWD
+Remove-Item -LiteralPath "$verionPath" -Force
 
 $spotifyInstalled = Test-Path -LiteralPath $spotifyExecutable
 $unsupportedClientVersion = ($actualSpotifyClientVersion | Test-SpotifyVersion -MinimalSupportedVersion $minimalSupportedSpotifyVersion) -eq $false
@@ -253,7 +265,9 @@ $patchFiles = (Join-Path -Path $PWD -ChildPath 'chrome_elf.dll'), (Join-Path -Pa
 
 Copy-Item -LiteralPath $patchFiles -Destination "$spotifyDirectory"
 
-$xpuiBundlePath = Join-Path -Path $spotifyApps -ChildPath 'xpui.spa'
+if ($RemoveAdPlaceholder)
+{
+  $xpuiBundlePath = Join-Path -Path $spotifyApps -ChildPath 'xpui.spa'
   $xpuiUnpackedPath = Join-Path -Path (Join-Path -Path $spotifyApps -ChildPath 'xpui') -ChildPath 'xpui.js'
   $fromZip = $false
 
@@ -312,6 +326,11 @@ $xpuiBundlePath = Join-Path -Path $spotifyApps -ChildPath 'xpui.spa'
     {
       Set-Content -LiteralPath $xpuiUnpackedPath -Value $xpuiContents
     }
+  }
+}
+else
+{
+  Write-Host "Not removing ad placeholder and upgrade button.`n"
 }
 
 try
