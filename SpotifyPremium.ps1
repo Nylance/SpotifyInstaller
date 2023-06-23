@@ -140,7 +140,7 @@ catch
 }
 
 Write-Host "Downloading and using the latest patch..`n"
-$elfPath = Join-Path -Path $PWD -ChildPath 'chrome_elf.zip'
+$elfPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
 try
 {
   $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper_verion.zip'
@@ -312,6 +312,14 @@ $xpuiBundlePath = Join-Path -Path $spotifyApps -ChildPath 'xpui.spa'
     {
       Set-Content -LiteralPath $xpuiUnpackedPath -Value $xpuiContents
     }
+}
+
+try
+{
+  for($i = 0; $i -le 100; $i++)
+{
+	Write-Progress -Activity "Patching Spotify" -PercentComplete $i -Status "Please wait for VerionSPTModifier to inject.. | $($i)%";
+	Sleep -Milliseconds 40;
 }
 
 $tempDirectory = $PWD
