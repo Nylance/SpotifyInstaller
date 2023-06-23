@@ -155,7 +155,7 @@ Write-Host "Downloading and using the latest patch..`n"
 $verionPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
 try
 {
-  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper_verion.zip'
+  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/download/Fixes/strapper_verion.zip'
   Get-File -Uri $uri -TargetFile "$verionPath"
 }
 catch
