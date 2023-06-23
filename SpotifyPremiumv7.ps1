@@ -4,16 +4,13 @@ param (
   $UninstallSpotifyStoreEdition = (Read-Host -Prompt 'Uninstall Spotify Windows Store edition if it exists (Y/N)') -eq 'y',
   [Parameter()]
   [switch]
-  $UpdateSpotify,
-  [Parameter()]
-  [switch]
-  $RemoveAdPlaceholder = (Read-Host -Prompt 'Optional - Remove ad placeholder and upgrade button. (Y/N)') -eq 'y'
+  $UpdateSpotify
 )
 
 # Ignore errors from `Stop-Process`
 $PSDefaultParameterValues['Stop-Process:ErrorAction'] = [System.Management.Automation.ActionPreference]::SilentlyContinue
 
-[System.Version] $minimalSupportedSpotifyVersion = '1.1.73.517'
+[System.Version] $minimalSupportedSpotifyVersion = '1.2.8.923'
 
 function Get-File
 {
@@ -111,7 +108,6 @@ $spotifyApps = Join-Path -Path $spotifyDirectory -ChildPath 'Apps'
 
 [System.Version] $actualSpotifyClientVersion = (Get-ChildItem -LiteralPath $spotifyExecutable -ErrorAction:SilentlyContinue).VersionInfo.ProductVersionRaw
 
-Write-Host "Stopping (and Closing) Spotify..`n"
 Stop-Process -Name Spotify
 Stop-Process -Name SpotifyWebHelper
 
@@ -122,7 +118,7 @@ if ($PSVersionTable.PSVersion.Major -ge 7)
 
 if (Get-AppxPackage -Name SpotifyAB.SpotifyMusic)
 {
-  Write-Host "The Microsoft Spotify Version isn't compatible; Please download Spotify from the website (If Auto Install doesn't work)!`n"
+  Write-Host "The Microsoft Store version of Spotify has been detected which is not supported.`n"
 
   if ($UninstallSpotifyStoreEdition)
   {
@@ -131,7 +127,7 @@ if (Get-AppxPackage -Name SpotifyAB.SpotifyMusic)
   }
   else
   {
-    Read-Host "Ending Tasks..`nPlease press any key to exit.."
+    Read-Host "Exiting...`nPress any key to exit..."
     exit
   }
 }
@@ -147,7 +143,7 @@ try
 catch
 {
   Write-Output $_
-  Read-Host 'Please press any key to exit..'
+  Read-Host 'Press any key to exit...'
   exit
 }
 
@@ -172,7 +168,7 @@ $unsupportedClientVersion = ($actualSpotifyClientVersion | Test-SpotifyVersion -
 
 if (-not $UpdateSpotify -and $unsupportedClientVersion)
 {
-  if ((Read-Host -Prompt 'In order to work your Spotify client must be updated. Do you want to continue? (Y/N)') -ne 'y')
+  if ((Read-Host -Prompt 'In order to install VerionSPTModifier, your Spotify client must be updated. Do you want to continue? (Y/N)') -ne 'y')
   {
     exit
   }
@@ -180,7 +176,7 @@ if (-not $UpdateSpotify -and $unsupportedClientVersion)
 
 if (-not $spotifyInstalled -or $UpdateSpotify -or $unsupportedClientVersion)
 {
-  Write-Host 'Trying to download the lastest version of Spotify, please wait..'
+  Write-Host 'Downloading the latest Spotify full setup, please wait...'
   $spotifySetupFilePath = Join-Path -Path $PWD -ChildPath 'SpotifyFullSetup.exe'
   try
   {
@@ -190,28 +186,28 @@ if (-not $spotifyInstalled -or $UpdateSpotify -or $unsupportedClientVersion)
   catch
   {
     Write-Output $_
-    Read-Host 'Please press any key to exit..'
+    Read-Host 'Press any key to exit...'
     exit
   }
   New-Item -Path $spotifyDirectory -ItemType:Directory -Force | Write-Verbose
 
   [System.Security.Principal.WindowsPrincipal] $principal = [System.Security.Principal.WindowsIdentity]::GetCurrent()
   $isUserAdmin = $principal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)
-  Write-Host 'Installing; please wait..'
+  Write-Host 'Running installation...'
   if ($isUserAdmin)
   {
     Write-Host
-    Write-Host 'Creating scheduled task..'
+    Write-Host 'Creating scheduled task...'
     $apppath = 'powershell.exe'
     $taskname = 'Spotify install'
     $action = New-ScheduledTaskAction -Execute $apppath -Argument "-NoLogo -NoProfile -Command & `'$spotifySetupFilePath`'"
     $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date)
     $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -WakeToRun
     Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $taskname -Settings $settings -Force | Write-Verbose
-    Write-Host 'The install task has been created. Starting the task..'
+    Write-Host 'The install task has been scheduled. Starting the task...'
     Start-ScheduledTask -TaskName $taskname
     Start-Sleep -Seconds 2
-    Write-Host 'Removing the task..'
+    Write-Host 'Unregistering the task...'
     Unregister-ScheduledTask -TaskName $taskname -Confirm:$false
     Start-Sleep -Seconds 2
   }
@@ -226,112 +222,22 @@ if (-not $spotifyInstalled -or $UpdateSpotify -or $unsupportedClientVersion)
     Start-Sleep -Milliseconds 100
   }
 
-  # Create a Shortcut to Spotify in %APPDATA%\Microsoft\Windows\Start Menu\Programs and Desktop
-  # (allows the program to be launched from search and desktop)
-  $wshShell = New-Object -ComObject WScript.Shell
 
-  $desktopShortcutPath = "$env:USERPROFILE\Desktop\Spotify.lnk"
-  if ((Test-Path $desktopShortcutPath) -eq $false)
-  {
-    $desktopShortcut = $wshShell.CreateShortcut($desktopShortcutPath)
-    $desktopShortcut.TargetPath = "$env:APPDATA\Spotify\Spotify.exe"
-    $desktopShortcut.Save()
-  }
-
-  $startMenuShortcutPath = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Spotify.lnk"
-  if ((Test-Path $startMenuShortcutPath) -eq $false)
-  {
-    $startMenuShortcut = $wshShell.CreateShortcut($startMenuShortcutPath)
-    $startMenuShortcut.TargetPath = "$env:APPDATA\Spotify\Spotify.exe"
-    $startMenuShortcut.Save()
-  }
-
-
-  Write-Host 'Stopping Spotify for the second time..'
+  Write-Host 'Stopping Spotify...Again'
 
   Stop-Process -Name Spotify
   Stop-Process -Name SpotifyWebHelper
   Stop-Process -Name SpotifyFullSetup
 }
-$elfDllBackFilePath = Join-Path -Path $spotifyDirectory -ChildPath 'chrome_elf_bak.dll'
-$elfBackFilePath = Join-Path -Path $spotifyDirectory -ChildPath 'chrome_elf.dll'
-if ((Test-Path $elfDllBackFilePath) -eq $false)
-{
-  Move-Item -LiteralPath "$elfBackFilePath" -Destination "$elfDllBackFilePath" | Write-Verbose
-}
 
-Write-Host 'Installing the Spotify Patch..'
-$patchFiles = (Join-Path -Path $PWD -ChildPath 'chrome_elf.dll'), (Join-Path -Path $PWD -ChildPath 'config.ini')
+$patchFiles = (Join-Path -Path $PWD -ChildPath 'dpapi.dll'), (Join-Path -Path $PWD -ChildPath 'config.ini')
 
 Copy-Item -LiteralPath $patchFiles -Destination "$spotifyDirectory"
 
-if ($RemoveAdPlaceholder)
-{
-  $xpuiBundlePath = Join-Path -Path $spotifyApps -ChildPath 'xpui.spa'
-  $xpuiUnpackedPath = Join-Path -Path (Join-Path -Path $spotifyApps -ChildPath 'xpui') -ChildPath 'xpui.js'
-  $fromZip = $false
+$tempDirectory = $PWD
+Pop-Location
 
-  # Try to read xpui.js from xpui.spa for normal Spotify installations, or
-  # directly from Apps/xpui/xpui.js in case Spicetify is installed.
-  if (Test-Path $xpuiBundlePath)
-  {
-    Add-Type -Assembly 'System.IO.Compression.FileSystem'
-    Copy-Item -Path $xpuiBundlePath -Destination "$xpuiBundlePath.bak"
-
-    $zip = [System.IO.Compression.ZipFile]::Open($xpuiBundlePath, 'update')
-    $entry = $zip.GetEntry('xpui.js')
-
-    # Extract xpui.js from zip to memory
-    $reader = New-Object System.IO.StreamReader($entry.Open())
-    $xpuiContents = $reader.ReadToEnd()
-    $reader.Close()
-
-    $fromZip = $true
-  }
-  elseif (Test-Path $xpuiUnpackedPath)
-  {
-    Copy-Item -LiteralPath $xpuiUnpackedPath -Destination "$xpuiUnpackedPath.bak"
-    $xpuiContents = Get-Content -LiteralPath $xpuiUnpackedPath -Raw
-
-    Write-Host 'Spicetify detected - You may need to reinstall BTS after running "spicetify apply".';
-  }
-  else
-  {
-    Write-Host 'Could not find xpui.js, please open an issue on the BlockTheSpot repository.'
-  }
-
-  if ($xpuiContents)
-  {
-    # Replace ".ads.leaderboard.isEnabled" + separator - '}' or ')'
-    # With ".ads.leaderboard.isEnabled&&false" + separator
-    $xpuiContents = $xpuiContents -replace '(\.ads\.leaderboard\.isEnabled)(}|\))', '$1&&false$2'
-
-    # Delete ".createElement(XX,{(spec:X),?onClick:X,className:XX.X.UpgradeButton}),X()"
-    $xpuiContents = $xpuiContents -replace '\.createElement\([^.,{]+,{(?:spec:[^.,]+,)?onClick:[^.,]+,className:[^.]+\.[^.]+\.UpgradeButton}\),[^.(]+\(\)', ''
-
-    # Disable Premium NavLink button
-    $xpuiContents = $xpuiContents -replace 'return (.\(\).createElement\("a".+?"noopener nofollow")', '$1'
-
-    if ($fromZip)
-    {
-      # Rewrite it to the zip
-      $writer = New-Object System.IO.StreamWriter($entry.Open())
-      $writer.BaseStream.SetLength(0)
-      $writer.Write($xpuiContents)
-      $writer.Close()
-
-      $zip.Dispose()
-    }
-    else
-    {
-      Set-Content -LiteralPath $xpuiUnpackedPath -Value $xpuiContents
-    }
-  }
-}
-else
-{
-  Write-Host "Not removing ad placeholder and upgrade button.`n"
-}
+Remove-Item -LiteralPath $tempDirectory -Recurse
 
 try
 {
@@ -341,11 +247,7 @@ try
 	Sleep -Milliseconds 40;
 }
 
-$tempDirectory = $PWD
-Pop-Location
-
-Remove-Item -LiteralPath $tempDirectory -Recurse
-
 Write-Host 'Patching Complete, starting Spotify...'
 
 Start-Process -WorkingDirectory $spotifyDirectory -FilePath $spotifyExecutable
+Write-Host 'Done.'
