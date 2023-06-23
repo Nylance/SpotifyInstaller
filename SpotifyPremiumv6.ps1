@@ -152,10 +152,10 @@ catch
 }
 
 Write-Host "Downloading and using the latest patch..`n"
-$elfPath = Join-Path -Path $PWD -ChildPath 'strapper_verion.zip'
+$elfPath = Join-Path -Path $PWD -ChildPath 'chrome_elf.zip'
 try
 {
-  $uri = 'https://github.com/Nylance/SpotifyInstaller/releases/latest/Fixes/strapper_verion.zip'
+  $uri = 'https://github.com/mrpond/BlockTheSpot/releases/latest/download/chrome_elf.zip'
   Get-File -Uri $uri -TargetFile "$elfPath"
 }
 catch
