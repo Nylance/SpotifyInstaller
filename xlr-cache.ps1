@@ -21,6 +21,7 @@ for($i = 0; $i -le 100; $i++)
 	Sleep -Milliseconds 2;
 }
 
+Write-Host " "
 Write-Host "Cache has been cleared, automatically closing prompt."
 
 Start-Sleep -Seconds 2
